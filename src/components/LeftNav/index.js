@@ -1,16 +1,15 @@
-import React, { useEffect, useState ,useLayoutEffect} from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Icon } from "antd";
 import { menuList } from "../../config/menuConfig";
 import logo from "../../assets/images/logo.png";
 import "./index.less";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_HEAD_TITLE } from "../../redux/actionType";
+import { setHeadTitle } from "../../redux/actions";
 
 const SubMenu = Menu.SubMenu;
-const setHeadTitle = (headTitle) => ({ type: SET_HEAD_TITLE, data: headTitle });
 
-const getOpenKey=(menuList) => {
+const getOpenKey = (menuList) => {
   let path = "";
   menuList.forEach((item) => {
     if (item.children) {
@@ -18,13 +17,12 @@ const getOpenKey=(menuList) => {
         (cItem) => useLocation().pathname.indexOf(cItem.key) >= 0
       );
       if (cItem) {
-        
-        path =  item.key;
+        path = item.key;
       }
     }
   });
   return path;
-}
+};
 
 const LeftNav = () => {
   const location = useLocation();
@@ -35,7 +33,6 @@ const LeftNav = () => {
   const user = useSelector((state) => {
     return state.loginReducer;
   });
-
 
   const hasAuth = (item) => {
     const { key, isPublic } = item;
@@ -60,7 +57,7 @@ const LeftNav = () => {
     return menuList.map((item) => {
       if (!item.children) {
         return (
-          <Menu.Item key={item.key}>
+          <Menu.Item key={item.key} onClick={() => dispatch(setHeadTitle(item.title))}>
             <Link to={item.key}>
               <Icon type={item.icon} />
               <span>{item.title}</span>
@@ -70,7 +67,7 @@ const LeftNav = () => {
       } else {
         return (
           <SubMenu
-            key={item.key}
+            key={item.key} 
             title={
               <span>
                 <Icon type={item.icon} />
@@ -89,13 +86,6 @@ const LeftNav = () => {
     return menuList.reduce((pre, item) => {
       if (hasAuth(item)) {
         if (!item.children) {
-          if (
-            item.key === location.pathname ||
-            location.pathname.indexOf(item.key) >= 0
-          ) {
-            // 更新redux中的headerTitle状态
-            dispatch(setHeadTitle(item.key));
-          }
           pre.push(
             <Menu.Item key={item.key}>
               <Link
@@ -127,18 +117,9 @@ const LeftNav = () => {
     }, []);
   };
 
-
-
-  
-
-  useLayoutEffect(() => {
+  useEffect(() => {
     setMenuNodes(getMenuNodes_map(menuList));
-    
   }, []);
-
-  
-
-
 
   return (
     <div className="left-nav">

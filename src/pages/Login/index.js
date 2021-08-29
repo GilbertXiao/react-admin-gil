@@ -1,15 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Redirect } from "react-router-dom";
-import { Form, Input, Icon, Button, message } from "antd";
+import { Form, Input, Icon, Button } from "antd";
 import logo from "./images/logo.png";
-import { saveUser } from "../../utils/storageUtils";
-import { useDispatch, useSelector } from "react-redux";
-import { RECEIVE_USER, SHOW_ERROR_MSG } from "../../redux/actionType";
+import { useSelector,useDispatch } from "react-redux";
+import { login } from "../../redux/actions";
 import "./login.less";
-import { getRequest, postRequest } from "../../api/ajax";
 
-const receiveUser = (user) => ({ type: RECEIVE_USER, user });
-const showErrorMsg = (errorMsg) => ({ type: SHOW_ERROR_MSG, errorMsg });
+
 
 const validatePwd = (rule, value) => {
   if (!value) {
@@ -24,46 +21,12 @@ const validatePwd = (rule, value) => {
 };
 
 function Login(props) {
+
   const dispatch = useDispatch();
 
-  const login = async (name, password) => {
-    // 1. 执行异步ajax请求
-    const result = await postRequest("/api/user/login", { name, password }); // {status: 0, data: user} {status: 1, msg: 'xxx'}
-    // 2.1. 如果成功, 分发成功的同步action
-    if (result.status === 0) {
-      const user = result.data;
-      if (user) {
-        const role = await getRequest(`/api/role/get/${user.roleId ?? ""}`);
-        // 保存local中
-        saveUser({
-          id: user.id ?? -1,
-          name: user.name ?? "",
-          menus: role.menus?.split(",") ?? [],
-          roleId: role.id?.toString() ?? "",
-        });
-        dispatch(
-          receiveUser({
-            id: user.id,
-            name: user.name,
-            roleId: user.roleId,
-            menus: role.menus?.split(","),
-          })
-        );
-        message.success("登录成功");
-      } else {
-        dispatch(showErrorMsg("用户名或密码错误"));
-      }
-    } else {
-      // 2.2. 如果失败, 分发失败的同步action
-      const msg = result.msg;
-      // message.error(msg)
-      dispatch({ type: SHOW_ERROR_MSG, msg });
-    }
-  };
-
   const handleSubmit = (values) => {
-    console.log(values);
-    login(values.name, values.password);
+    //console.log(values);
+    login(values.name, values.password)(dispatch);
   };
 
   // 如果用户已经登陆, 自动跳转到管理界面

@@ -4,14 +4,7 @@ import { Redirect, Route, Switch } from "react-router";
 import { Layout } from "antd";
 import Header from "../../components/Header";
 import LeftNav from "../../components/LeftNav";
-import Bar from "../../components/Bar";
-import Category from "../../components/Category";
-import Line from "../../components/Line";
-import Pie from "../../components/Pie";
-import Product from "../../components/Product";
-import Role from "../../components/Role";
-import User from "../../components/User";
-import Home from "../../components/Home";
+import FrontendAuth from "../../components/FrontendAuth";
 
 const { Footer, Sider, Content } = Layout;
 const Admin = () => {
@@ -30,15 +23,7 @@ const Admin = () => {
         <Header>Header</Header>
         <Content style={{ backgroundColor: "white" }}>
           <Switch>
-            <Route path="/home" component={Home} />
-            <Route path="/category" component={Category} />
-            <Route path="/product" component={Product} />
-            <Route path="/role" component={Role} />
-            <Route path="/user" component={User} />
-            <Route path="/charts/bar" component={Bar} />
-            <Route path="/charts/line" component={Line} />
-            <Route path="/charts/pie" component={Pie} />
-            <Redirect to="/home" />
+            <FrontendAuth/>
           </Switch>
         </Content>
         <Footer style={{ textAlign: "center", color: "#aaaaaa" }}>
