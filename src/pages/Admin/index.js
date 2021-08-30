@@ -21,7 +21,7 @@ const Admin = () => {
       </Sider>
       <Layout>
         <Header>Header</Header>
-        <Content style={{ backgroundColor: "white" }}>
+        <Content style={{  backgroundColor: '#fff', margin: '20px'  }}>
           <Switch>
             <FrontendAuth/>
           </Switch>
