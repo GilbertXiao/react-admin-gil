@@ -82,22 +82,57 @@ const extra = (
 );
 
 const reducer = (state, action) => {
-  
+  const { total, products, loading, searchName, searchType, pageNum } = state;
+  const { type } = action;
+  if (type === "loading") {
+    return { total, products, searchName, searchType, pageNum, loading: true };
+  } else if (type === "updateProduct") {
+    const { result } = action;
+    return {
+      total: result.total,
+      products: result.list,
+      searchName,
+      searchType,
+      pageNum,
+      loading: false,
+    };
+  } else if (type === "updateSeachType") {
+    const { value } = action;
+    return {
+      total,
+      products,
+      searchName,
+      pageNum,
+      loading,
+      searchType: value,
+    };
+  } else if (type === "updateSeachName") {
+    const { searchName } = action;
+    return {
+      total,
+      products,
+      pageNum,
+      loading,
+      searchType,
+      searchName: searchName,
+    };
+  }
+};
+const initProductState = {
+  total: 0, // 商品的总数量
+  products: [], // 商品的数组
+  loading: false, // 是否正在加载中
+  searchName: "", // 搜索的关键字
+  searchType: "productName", // 根据哪个字段搜索
+  pageNum: 1,
 };
 const Product = () => {
-  const [productState, setProductState] = useState({
-    total: 0, // 商品的总数量
-    products: [], // 商品的数组
-    loading: false, // 是否正在加载中
-    searchName: "", // 搜索的关键字
-    searchType: "productName", // 根据哪个字段搜索
-    pageNum: 1,
-  });
+  const [productState, dispatch] = useReducer(reducer, initProductState);
   const { total, products, loading, searchName, searchType, pageNum } =
     productState;
 
   const getDataSources = async (pageNum) => {
-    setProductState({ loading: true });
+    dispatch({ type: "loading" });
     let result = null;
     if (searchName !== "") {
       if (searchType === "productName") {
@@ -106,7 +141,6 @@ const Product = () => {
           pageNum: pageNum,
           pageSize: PAGE_SIZE,
         });
-        
       } else {
         result = await getRequest(
           `/api/products/searchByDesc/${searchName}/${pageNum}/${PAGE_SIZE}`
@@ -117,14 +151,8 @@ const Product = () => {
         pageNum,
         pageSize: PAGE_SIZE,
       });
-      
     }
-    setProductState({
-      products: result.list,
-      total: result.total,
-      loading: false,
-      pageNum: pageNum,
-    });
+    dispatch({ type: "updateProduct", result });
   };
 
   const title = (
@@ -132,9 +160,7 @@ const Product = () => {
       <Select
         value={searchType}
         style={{ width: 150 }}
-        onChange={(value) =>
-          setProductState({ ...productState, searchType: value })
-        }
+        onChange={(value) => dispatch({ type: "updateSeachType", value })}
       >
         <Select.Option value="productName">按名称搜索</Select.Option>
         <Select.Option value="productDesc">按描述搜索</Select.Option>
@@ -144,7 +170,7 @@ const Product = () => {
         style={{ width: 150, margin: "0 15px" }}
         value={searchName}
         onChange={(event) =>
-          setProductState({ ...productState, searchName: event.target.value })
+          dispatch({ type: "updateSeachName", searchName: event.target.value })
         }
       />
       <Button type="primary" onClick={() => getDataSources(1)}>
