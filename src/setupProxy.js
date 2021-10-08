@@ -8,6 +8,12 @@ module.exports = function (app) {
     })
   );
   app.use(
+    createProxyMiddleware("/uploadFile", {
+      target: "http://localhost:5000/",
+      changeOrigin: true,
+    })
+  );
+  app.use(
     createProxyMiddleware("/fileApi", {
       target: "http://localhost:5000/",
       changeOrigin: true,

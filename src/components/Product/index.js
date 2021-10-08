@@ -4,82 +4,11 @@ import { PlusOutlined } from "@ant-design/icons";
 import LinkButton from "../LinkButton";
 import { PAGE_SIZE } from "../../utils/Constants";
 import { useHistory } from "react-router";
-import { getRequest, postRequest } from "../../api/ajax";
+import { getRequest, postRequest, putRequest } from "../../api/ajax";
+import { useDispatch } from "react-redux";
+import { ADD_PRODUCT, UPDATE_PRODUCT,PRODUCT_DETAIL} from "../../redux/actionType";
 
-const columns = [
-  {
-    title: "商品名称",
-    dataIndex: "name",
-  },
-  {
-    title: "商品描述",
-    dataIndex: "desc",
-  },
-  {
-    title: "价格",
-    dataIndex: "price",
-    render: (price) => {
-      return "￥" + price;
-    },
-  },
-  {
-    title: "状态",
-    render: (product) => {
-      const { status, id } = product;
-      return (
-        <span>
-          <Button
-            type="primary"
-            onClick={() => {
-              if (id === undefined) {
-                message.error("id为空");
-                return;
-              }
-              this.updateStatus(id, status === 1 ? 2 : 1);
-            }}
-          >
-            {status === 1 ? "下架" : "上架"}
-          </Button>
-          <span>{status === 1 ? "在售" : "已下架"}</span>
-        </span>
-      );
-    },
-  },
-  {
-    title: "操作",
-    render: (product) => {
-      return (
-        <span>
-          <LinkButton
-            onClick={() => {
-              this.showDetails(product);
-            }}
-          >
-            详情
-          </LinkButton>
-          <LinkButton
-            onClick={() => {
-              this.showUpdate(product);
-            }}
-          >
-            修改
-          </LinkButton>
-        </span>
-      );
-    },
-  },
-];
-const extra = (
-  <Button
-    type="primary"
-    icon={<PlusOutlined />}
-    onClick={() => {
-      useHistory().push("/product/add");
-    }}
-  >
-    添加商品
-  </Button>
-);
+
 
 const reducer = (state, action) => {
   const { total, products, loading, searchName, searchType, pageNum } = state;
@@ -130,6 +59,106 @@ const Product = () => {
   const [productState, dispatch] = useReducer(reducer, initProductState);
   const { total, products, loading, searchName, searchType, pageNum } =
     productState;
+  const history = useHistory();
+  const dispatchStore = useDispatch();
+
+
+    const extra = (
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => {
+          dispatchStore({type:ADD_PRODUCT});
+          history.push("/product/add");
+        }}
+      >
+        添加商品
+      </Button>
+    );
+
+  const updateStatus = async (id, status) => {
+    const result = await putRequest(`/api/products/updateStatus/${id}`, {
+      status,
+    });
+    if (result === 1) {
+      getDataSources(pageNum);
+    }
+  };
+
+  const showDetails=(product)=>{
+
+    dispatchStore({type:PRODUCT_DETAIL,product});
+    history.push("/product/detail");
+
+  }
+
+  const showUpdate=(product)=>{
+    dispatchStore({type:UPDATE_PRODUCT,product});
+    history.push("/product/update");
+  }
+  const columns = [
+    {
+      title: "商品名称",
+      dataIndex: "name",
+    },
+    {
+      title: "商品描述",
+      dataIndex: "desc",
+    },
+    {
+      title: "价格",
+      dataIndex: "price",
+      render: (price) => {
+        return "￥" + price;
+      },
+    },
+    {
+      title: "状态",
+      render: (product) => {
+        const { status, id } = product;
+        return (
+          <span>
+            <Button
+              type="primary"
+              onClick={() => {
+                if (id === undefined) {
+                  message.error("id为空");
+                  return;
+                }
+                updateStatus(id, status === 1 ? 2 : 1);
+              }}
+            >
+              {status === 1 ? "下架" : "上架"}
+            </Button>
+            <span>{status === 1 ? "在售" : "已下架"}</span>
+          </span>
+        );
+      },
+    },
+    {
+      title: "操作",
+      render: (product) => {
+        return (
+          <span>
+            <LinkButton
+              onClick={() => {
+                showDetails(product);
+              }}
+            >
+              详情
+            </LinkButton>
+            <LinkButton
+              onClick={() => {
+                showUpdate(product);
+              }}
+            >
+              修改
+            </LinkButton>
+          </span>
+        );
+      },
+    },
+  ];
 
   const getDataSources = async (pageNum) => {
     dispatch({ type: "loading" });

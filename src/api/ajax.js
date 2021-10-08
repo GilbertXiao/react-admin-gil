@@ -3,25 +3,25 @@ import {message} from 'antd'
 
 axios.interceptors.response.use(success => {
     if (success.status && success.status == 200 && success.data.status == 500) {
-      message.error({message: success.data.msg})
+      message.error({content: success.data.msg})
         return;
     }
     if (success.data.msg) {
-      message.success({message: success.data.msg})
+      message.success({content: success.data.msg})
     }
     return success.data;
 }, error => {
     if (error.response.status == 504 || error.response.status == 404) {
-      message.error({message: '服务器被吃了( ╯□╰ )'})
+      message.error({content: '服务器被吃了( ╯□╰ )'})
     } else if (error.response.status == 403) {
-      message.error({message: '权限不足，请联系管理员'})
+      message.error({content: '权限不足，请联系管理员'})
     } else if (error.response.status == 401) {
-      message.error({message: error.response.data.msg ? error.response.data.msg : '尚未登录，请登录'})
+      message.error({content: error.response.data.msg ? error.response.data.msg : '尚未登录，请登录'})
     } else {
         if (error.response.data.msg) {
-          message.error({message: error.response.data.msg})
+          message.error({content: error.response.data.msg})
         } else {
-          message.error({message: '未知错误!'})
+          message.error({content: '未知错误!'})
         }
     }
     return;
@@ -51,6 +51,17 @@ export const postRequest = (url, params,base=baseUrl) => {
         method: 'post',
         url: `${base}${url}`,
         data: params
+    })
+}
+
+export const postFileRequest = (url, params,base=baseUrl) => {
+    return axios({
+        method: 'post',
+        url: `${base}${url}`,
+        data: params,
+        header:{
+            'Content-Type': 'multipart/form-data'
+        }
     })
 }
 export const putRequest = (url, params,base=baseUrl) => {

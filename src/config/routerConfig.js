@@ -11,6 +11,8 @@ import Home from "../components/Home";
 import Order from "../components/Order";
 import Login from "../pages/Login";
 import Admin from "../pages/Admin";
+import ProductAdd from "../components/Product/Add";
+import PrductDetail from "../components/Product/Detail";
 
 const routerConfig = [
   {
@@ -32,6 +34,21 @@ const routerConfig = [
     path: "/product",
     auth: true,
     component: Product,
+  },
+  {
+    path: "/product/add",
+    auth: true,
+    component: ProductAdd,
+  },
+  {
+    path: "/product/update",
+    auth: true,
+    component: ProductAdd,
+  },
+  {
+    path: "/product/detail",
+    auth: true,
+    component: PrductDetail,
   },
   {
     path: "/user",
