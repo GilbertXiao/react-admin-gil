@@ -13,6 +13,7 @@ import Login from "../pages/Login";
 import Admin from "../pages/Admin";
 import ProductAdd from "../components/Product/Add";
 import PrductDetail from "../components/Product/Detail";
+import StarMatch from "../components/StarMatch";
 
 const routerConfig = [
   {
@@ -79,6 +80,11 @@ const routerConfig = [
     path: "/order",
     auth: true,
     component: Order,
+  },
+  {
+    path: "/game",
+    auth: true,
+    component: StarMatch,
   },
 ];
 

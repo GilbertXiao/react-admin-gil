@@ -62,4 +62,9 @@ export const menuList = [
     key: '/order',
     icon: 'windows',
   },
+  {
+    title: '游戏',
+    key: '/game',
+    icon: 'windows',
+  },
 ];
